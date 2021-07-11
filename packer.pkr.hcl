@@ -32,13 +32,13 @@ build {
     inline = [
       "export DEBIAN_FRONTEND=noninteractive",
       "apt update && apt install default-jre -y",
-      "mkdir -p /workspace"
+      "mkdir -p /app"
     ]
   }
 
   provisioner "file" {
     source      = "target/spring-petclinic-rest-2.4.2.jar"
-    destination = "/workspace/"
+    destination = "/app/spring-petclinic-rest-2.4.2.jar"
   }
 
   post-processor "manifest" {}
