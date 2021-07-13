@@ -76,3 +76,12 @@ jobs:
       run: |
         export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.write_secret_file.outputs.filePath }}
         packer build packer.pkr.hcl
+
+    - name: Upload packer-manifest.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: packer-manifest
+        path: packer-manifest.json
+
+    - name: cat packer-manifest.json
+      run: cat packer-manifest.json
