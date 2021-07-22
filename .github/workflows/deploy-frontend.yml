@@ -36,3 +36,54 @@ jobs:
       with:
         name: dist
         path: dist/
+
+  packing:
+    name: Packing
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Packer
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install packer
+
+    - name: Checking Lint
+      run: packer fmt -check -diff frontend.pkr.hcl
+
+    - name: Init packer
+      run: packer init frontend.pkr.hcl
+
+    - name: Download dist
+      uses: actions/download-artifact@v2
+      with:
+        name: dist
+        path: ./dist
+
+    - name: Validate packer file
+      run: packer validate frontend.pkr.hcl
+
+    - name: Setup secret file
+      id: write_secret_file
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'creds.json'
+        encodedString: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64 }}
+
+    - name: Build image
+      run: |
+        export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.write_secret_file.outputs.filePath }}
+        packer build frontend.pkr.hcl
+
+    - name: Upload packer-manifest.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: packer-manifest
+        path: packer-manifest.json
+
+    - name: cat packer-manifest.json
+      run: cat packer-manifest.json
