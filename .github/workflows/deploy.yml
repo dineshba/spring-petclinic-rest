@@ -57,13 +57,13 @@ jobs:
         sudo apt-get update && sudo apt-get install packer
 
     - name: Checking Lint
-      run: packer fmt -check -diff packer.pkr.hcl
+      run: packer fmt -check -diff backend.pkr.hcl
 
     - name: Init packer
       run: packer init .
 
     - name: Validate packer file
-      run: packer validate packer.pkr.hcl
+      run: packer validate backend.pkr.hcl
 
     - name: Setup secret file
       id: write_secret_file
@@ -75,7 +75,7 @@ jobs:
     - name: Build image
       run: |
         export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.write_secret_file.outputs.filePath }}
-        packer build packer.pkr.hcl
+        packer build backend.pkr.hcl
 
     - name: Upload packer-manifest.json
       uses: actions/upload-artifact@v2

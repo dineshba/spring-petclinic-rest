@@ -19,6 +19,7 @@ variable zone {
 source "googlecompute" "build" {
   project_id   = var.project_id
   source_image = "ubuntu-1804-bionic-v20210623"
+  image_name   = "petclinic-backend-{{timestamp}}"
   ssh_username = "root"
   zone         = var.zone
 }
