@@ -35,7 +35,7 @@ jobs:
       run: packer fmt -check -diff postgres.pkr.hcl
 
     - name: Init packer
-      run: packer init .
+      run: packer init postgres.pkr.hcl
 
     - name: Validate packer file
       run: packer validate postgres.pkr.hcl

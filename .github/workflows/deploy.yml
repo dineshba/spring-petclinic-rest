@@ -1,4 +1,4 @@
-name: "Build Backend Images"
+name: "Build Backend Image"
 
 on:
   push:
@@ -60,7 +60,7 @@ jobs:
       run: packer fmt -check -diff backend.pkr.hcl
 
     - name: Init packer
-      run: packer init .
+      run: packer init backend.pkr.hcl
 
     - name: Validate packer file
       run: packer validate backend.pkr.hcl
