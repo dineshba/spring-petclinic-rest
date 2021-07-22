@@ -1,7 +1,9 @@
-name: "Build Backend Images"
+name: "Build Postgres Image"
 
 on:
   push:
+    paths:
+      - 'postgres.pkr.hcl'
     branches:
       - main
 
@@ -15,40 +17,13 @@ defaults:
 
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - uses: addnab/docker-run-action@v3
-      with:
-        image: openjdk:11.0.11-jdk-oracle
-        options: -v ${{ github.workspace }}:/workspace
-        run: |
-          cd /workspace
-          ./mvnw package
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: app_jar
-        path: target/spring-petclinic-rest-2.4.2.jar
-
   packing:
     name: Packing
     runs-on: ubuntu-latest
-    needs: [build]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Download build jar
-      uses: actions/download-artifact@v2
-      with:
-        name: app_jar
-        path: target/
 
     - name: Install Packer
       run: |
@@ -57,13 +32,13 @@ jobs:
         sudo apt-get update && sudo apt-get install packer
 
     - name: Checking Lint
-      run: packer fmt -check -diff backend.pkr.hcl
+      run: packer fmt -check -diff postgres.pkr.hcl
 
     - name: Init packer
       run: packer init .
 
     - name: Validate packer file
-      run: packer validate backend.pkr.hcl
+      run: packer validate postgres.pkr.hcl
 
     - name: Setup secret file
       id: write_secret_file
@@ -75,7 +50,7 @@ jobs:
     - name: Build image
       run: |
         export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.write_secret_file.outputs.filePath }}
-        packer build backend.pkr.hcl
+        packer build postgres.pkr.hcl
 
     - name: Upload packer-manifest.json
       uses: actions/upload-artifact@v2
