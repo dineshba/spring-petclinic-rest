@@ -1,0 +1,38 @@
+name: "Build Frontend Image"
+
+on:
+  workflow_dispatch:
+
+env:
+  PKR_VAR_project_id: root-amulet-315711
+  PKR_VAR_zone: "us-central1-a" 
+
+defaults:
+  run:
+    shell: bash
+
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: dineshba/spring-petclinic-angular
+
+    - uses: addnab/docker-run-action@v3
+      with:
+        image: node:10.10-alpine
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          echo "registry=https://registry.npmjs.org" > .npmrc
+          npm install
+          ./node_modules/.bin/ng build --prod --base-href=/petclinic/ --deploy-url=/petclinic/
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist/
