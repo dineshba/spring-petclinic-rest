@@ -11,6 +11,7 @@ on:
 env:
   PKR_VAR_project_id: root-amulet-315711
   PKR_VAR_zone: "us-central1-a" 
+  PKR_VAR_postgres_user_password: petclinic
 
 defaults:
   run:
