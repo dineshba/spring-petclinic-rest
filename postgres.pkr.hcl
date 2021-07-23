@@ -32,7 +32,9 @@ build {
   provisioner "shell" {
     inline = [
       "apt update && apt -y install postgresql postgresql-client postgresql-contrib",
-      "sudo -u postgres createdb petclinic"
+      "sudo -u postgres createdb petclinic",
+      "echo \"listen_addresses = '*'\" >> /etc/postgresql/10/main/postgresql.conf",
+      "echo \"host    all       all   0.0.0.0/0     md5\" >> /etc/postgresql/10/main/pg_hba.conf"
     ]
   }
 

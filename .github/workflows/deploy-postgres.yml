@@ -1,6 +1,7 @@
 name: "Build Postgres Image"
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'postgres.pkr.hcl'
