@@ -42,8 +42,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "nginx.conf"
-    destination = "/etc/nginx/nginx.conf"
+    source      = "nginx.conf.tpl"
+    destination = "/etc/nginx/nginx.conf.tpl"
   }
 
   post-processor "manifest" {}
