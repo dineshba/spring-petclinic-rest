@@ -21,6 +21,9 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: dineshba/spring-petclinic-angular
+    - name: Update env for frontend
+      run: |
+        echo "export const environment = {production: true, REST_API_URL: 'petclinic/api/'};" > src/environments/environment.prod.ts
 
     - uses: addnab/docker-run-action@v3
       with:
