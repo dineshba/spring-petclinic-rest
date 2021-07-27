@@ -1,0 +1,76 @@
+name: "Stack Deployment"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Build Backend Image"
+      - "Build Frontend Image"
+      - "Build Postgres Image"
+    branches: [main]
+    types:
+      - completed
+
+env:
+  TF_VAR_project: "root-amulet-315711"
+  TF_VAR_region: "us-central1"
+
+defaults:
+  run:
+    shell: bash
+
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Download backend artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+        path: backend
+
+    - name: Download frontend artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy-frontend.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+        path: frontend
+
+    - name: Download postgres artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy-postgres.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+        path: postgres
+
+    - name: Populate latest images env name
+      run: |
+        echo "TF_VAR_backend_image_id=$(cat backend/packer-manifest.json | jq .builds[].artifact_id -r)"  >> $GITHUB_ENV
+        echo "TF_VAR_frontend_image_id=$(cat frontend/packer-manifest.json | jq .builds[].artifact_id -r)"  >> $GITHUB_ENV
+        echo "TF_VAR_postgres_image_id=$(cat postgres/packer-manifest.json | jq .builds[].artifact_id -r)"  >> $GITHUB_ENV
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Init terrform
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64}}
+      run: cd terraform && ./terraform.sh init
+
+    - name: Plan
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64}}
+      run: cd terraform && ./terraform.sh plan
