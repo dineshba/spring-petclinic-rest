@@ -13,7 +13,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Download artifact
+    - name: Download backend artifact
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: deploy.yml
@@ -22,8 +22,26 @@ jobs:
         name: packer-manifest
         path: backend
     - name: Print
-      run: |
-        set +e
-        ls
-        cat packer-manifest.json
-        cat backend/packer-manifest.json
+      run: cat backend/packer-manifest.json
+
+    - name: Download frontend artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy-frontend.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+        path: frontend
+    - name: Print
+      run: cat frontend/packer-manifest.json
+
+    - name: Download postgres artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy-postgres.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+        path: postgres
+    - name: Print
+      run: cat postgres/packer-manifest.json
