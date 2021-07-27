@@ -1,5 +1,5 @@
 data "google_compute_image" "postgres_image" {
-  name    = "petclinic-postgres-v1"
+  name    = var.postgres_image_id
   project = var.project
 }
 

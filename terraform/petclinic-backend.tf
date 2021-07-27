@@ -3,7 +3,7 @@ locals {
 }
 
 data "google_compute_image" "application_image" {
-  name    = "petclinic-backend-1627014617"
+  name    = var.backend_image_id
   project = var.project
 }
 
