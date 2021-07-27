@@ -32,7 +32,7 @@ EOF
 }
 
 resource "google_compute_instance_group_manager" "petclinic_application_igm" {
-  name = "petclinic-application"
+  name = "petclinic-application-${substr(google_compute_instance_template.petclinic_application_instance_template.id, -26, -1)}"
 
   base_instance_name = "petclinic-application"
   zone               = "us-central1-a"
@@ -85,7 +85,7 @@ data "google_compute_network" "default" {
 module "lb" {
   source = "github.com/gruntwork-io/terraform-google-load-balancer.git//modules/internal-load-balancer?ref=v0.2.0"
 
-  name    = "petclinic-lb"
+  name    = "petclinic-lb-${substr(google_compute_instance_group_manager.petclinic_application_igm.id, -26, -1)}"
   region  = var.region
   project = var.project
 

@@ -25,13 +25,14 @@ resource "google_compute_instance_template" "petclinic_fe_instance_template" {
   tags = ["http-server", local.fe-tag]
 
   metadata_startup_script = <<EOF
-BACKEND_ADDR=${module.lb.load_balancer_ip_address} envsubst < /etc/nginx/nginx.conf.tpl > /etc/nginx/nginx.conf
+BACKEND_ADDR=${module.lb.load_balancer_ip_address} envsubst \$BACKEND_ADDR < /etc/nginx/nginx.conf.tpl > /etc/nginx/nginx.conf
+/etc/init.d/nginx reload
 EOF
 
 }
 
 resource "google_compute_instance_group_manager" "petclinic_fe_igm" {
-  name = "fe-petclinic-application"
+  name = "fe-petclinic-application-${substr(google_compute_instance_template.petclinic_fe_instance_template.id, -26, -1)}"
 
   base_instance_name = "fe-petclinic-application"
   zone               = "us-central1-a"
@@ -107,7 +108,7 @@ module "gce-lb-http" {
   version = "~> 4.4"
 
   project     = var.project
-  name        = "group-http-lb"
+  name        = "group-http-lb-${substr(google_compute_instance_group_manager.petclinic_fe_igm.id, -26, -1)}"
   target_tags = [local.fe-tag]
   backends = {
     default = {
