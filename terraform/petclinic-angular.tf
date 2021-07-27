@@ -2,86 +2,26 @@ locals {
   fe-tag = "petclinic-fe"
 }
 
-data "google_compute_image" "fe_application_image" {
-  name    = var.frontend_image_id
-  project = var.project
-}
-
-resource "google_compute_instance_template" "petclinic_fe_instance_template" {
-  name_prefix  = "fe-instance-template-"
-  machine_type = "e2-medium"
-  region       = "us-central1"
-
-  disk {
-    source_image = data.google_compute_image.fe_application_image.self_link
-    auto_delete  = true
-    boot         = true
-  }
-
-  network_interface {
-    network = "default"
-  }
-
-  tags = ["http-server", local.fe-tag]
-
-  metadata_startup_script = <<EOF
+module "angular_instance_group" {
+  source     = "./modules/instance-group"
+  image_name = var.frontend_image_id
+  project    = var.project
+  region     = var.region
+  zone       = var.zone
+  network    = data.google_compute_network.default.name
+  tags       = [local.fe-tag]
+  name       = "fe-petclinic"
+  named_ports = [
+    {
+      name = "http"
+      port = "80"
+  }]
+  health_check_initial_delay_sec = 60
+  metadata_startup_script        = <<EOF
 BACKEND_ADDR=${google_compute_address.backend_internal_address.address} envsubst \$BACKEND_ADDR < /etc/nginx/nginx.conf.tpl > /etc/nginx/nginx.conf
 /etc/init.d/nginx reload
 EOF
 
-}
-
-resource "google_compute_instance_group_manager" "petclinic_fe_igm" {
-  name = "fe-petclinic-application-${substr(google_compute_instance_template.petclinic_fe_instance_template.id, -26, -1)}"
-
-  base_instance_name = "fe-petclinic-application"
-  zone               = "us-central1-a"
-
-  version {
-    instance_template = google_compute_instance_template.petclinic_fe_instance_template.id
-  }
-
-  named_port {
-    name = "http"
-    port = "80"
-  }
-
-  target_size = 1
-
-  auto_healing_policies {
-    health_check      = google_compute_health_check.fe_health_check.id
-    initial_delay_sec = 30
-  }
-}
-
-resource "google_compute_health_check" "fe_health_check" {
-  name                = "fe-health-check"
-  check_interval_sec  = 10
-  timeout_sec         = 5
-  healthy_threshold   = 2
-  unhealthy_threshold = 10
-
-  http_health_check {
-    request_path = "/"
-    port         = "80"
-  }
-}
-
-resource "google_compute_firewall" "fe_health_check" {
-  name    = "allow-fe-health-check"
-  network = data.google_compute_network.default.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
-  }
-
-  target_tags = [local.fe-tag]
-
-  source_ranges = [
-    "130.211.0.0/22",
-    "35.191.0.0/16"
-  ]
 }
 
 module "gce-lb-http" {
@@ -89,7 +29,7 @@ module "gce-lb-http" {
   version = "~> 4.4"
 
   project     = var.project
-  name        = "group-http-lb-${substr(google_compute_instance_group_manager.petclinic_fe_igm.id, -26, -1)}"
+  name        = "group-http-lb-${substr(module.angular_instance_group.id, -26, -1)}"
   target_tags = [local.fe-tag]
   backends = {
     default = {
@@ -125,7 +65,7 @@ module "gce-lb-http" {
 
       groups = [
         {
-          group                        = google_compute_instance_group_manager.petclinic_fe_igm.instance_group
+          group                        = module.angular_instance_group.self_link
           balancing_mode               = null
           capacity_scaler              = null
           description                  = null

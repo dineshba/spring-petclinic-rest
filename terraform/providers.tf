@@ -9,6 +9,6 @@ terraform {
 
 provider "google" {
   project = var.project
-  region  = "us-central1"
+  region  = var.region
   zone    = "us-central1-c"
 }
