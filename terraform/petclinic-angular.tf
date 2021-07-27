@@ -25,7 +25,7 @@ resource "google_compute_instance_template" "petclinic_fe_instance_template" {
   tags = ["http-server", local.fe-tag]
 
   metadata_startup_script = <<EOF
-BACKEND_ADDR=${module.lb.load_balancer_ip_address} envsubst \$BACKEND_ADDR < /etc/nginx/nginx.conf.tpl > /etc/nginx/nginx.conf
+BACKEND_ADDR=${google_compute_address.backend_internal_address.address} envsubst \$BACKEND_ADDR < /etc/nginx/nginx.conf.tpl > /etc/nginx/nginx.conf
 /etc/init.d/nginx reload
 EOF
 
@@ -84,25 +84,6 @@ resource "google_compute_firewall" "fe_health_check" {
   ]
 }
 
-# data "google_compute_network" "default" {
-#   name = "default"
-# }
-
-
-# module "fe_lb" {
-#   source = "github.com/gruntwork-io/terraform-google-load-balancer.git//modules/http-load-balancer"
-
-#   name    = "fe-petclinic-lb"
-#   # region  = var.region
-#   project = var.project
-
-#   url_map = google_compute_instance_group_manager.petclinic_fe_igm.instance_group
-# }
-
-# output "fe-load_balancer_ip_address" {
-#   value = module.fe_lb.load_balancer_ip_address
-# }
-
 module "gce-lb-http" {
   source  = "GoogleCloudPlatform/lb-http/google"
   version = "~> 4.4"
@@ -144,7 +125,6 @@ module "gce-lb-http" {
 
       groups = [
         {
-          # Each node pool instance group should be added to the backend.
           group                        = google_compute_instance_group_manager.petclinic_fe_igm.instance_group
           balancing_mode               = null
           capacity_scaler              = null

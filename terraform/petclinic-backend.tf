@@ -43,6 +43,11 @@ resource "google_compute_instance_group_manager" "petclinic_application_igm" {
 
   target_size = 2
 
+  named_port {
+    name = "http"
+    port = "9966"
+  }
+
   auto_healing_policies {
     health_check      = google_compute_health_check.autohealing.id
     initial_delay_sec = 120
@@ -81,39 +86,48 @@ data "google_compute_network" "default" {
   name = "default"
 }
 
-
-module "lb" {
-  source = "github.com/gruntwork-io/terraform-google-load-balancer.git//modules/internal-load-balancer?ref=v0.2.0"
-
-  name    = "petclinic-lb-${substr(google_compute_instance_group_manager.petclinic_application_igm.id, -26, -1)}"
-  region  = var.region
-  project = var.project
-
-  backends = [
-    {
-      description = "Instance group for internal-load-balancer test"
-      group       = google_compute_instance_group_manager.petclinic_application_igm.instance_group
-    },
-  ]
-
-  # This setting will enable internal DNS for the load balancer
-  service_label = "petclinic-lb"
-
-  # network    = default
-  # subnetwork = module.vpc_network.public_subnetwork
-
-  health_check_port = 9966
-  http_health_check = false
-  target_tags       = [local.be-tag]
-  source_tags       = [local.fe-tag]
-  ports             = ["9966"]
+data "google_compute_subnetwork" "default" {
+  name   = "default"
+  region = var.region
 }
 
-output "load_balancer_domain_name" {
-  value = module.lb.load_balancer_domain_name
-
+resource "google_compute_address" "backend_internal_address" {
+  name         = "backend-internal-address"
+  subnetwork   = data.google_compute_subnetwork.default.id
+  address_type = "INTERNAL"
+  region       = var.region
 }
 
 output "load_balancer_ip_address" {
-  value = module.lb.load_balancer_ip_address
+  value = module.gce-ilb.ip_address
+}
+
+module "gce-ilb" {
+  source  = "GoogleCloudPlatform/lb-internal/google"
+  version = "~> 2.0"
+  region  = var.region
+  name    = "backend-ilb-${substr(google_compute_instance_group_manager.petclinic_application_igm.id, -26, -1)}"
+  ports   = ["9966"]
+  health_check = {
+    type                = "http"
+    check_interval_sec  = 10
+    healthy_threshold   = 4
+    timeout_sec         = 3
+    unhealthy_threshold = 5
+    response            = ""
+    proxy_header        = "NONE"
+    port                = 9966
+    port_name           = "http"
+    request             = ""
+    request_path        = "/petclinic/actuator/health"
+    host                = ""
+    enable_log          = false
+  }
+
+  ip_address  = google_compute_address.backend_internal_address.address
+  target_tags = [local.be-tag]
+  source_tags = [local.fe-tag]
+  backends = [
+    { group = google_compute_instance_group_manager.petclinic_application_igm.instance_group, description = "" },
+  ]
 }

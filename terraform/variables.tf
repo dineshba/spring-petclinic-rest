@@ -7,13 +7,13 @@ variable "region" {
 }
 
 variable "backend_image_id" {
-    type = string
+  type = string
 }
 
 variable "frontend_image_id" {
-    type = string
+  type = string
 }
 
 variable "postgres_image_id" {
-    type = string
+  type = string
 }
