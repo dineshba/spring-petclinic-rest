@@ -6,7 +6,7 @@ data "google_compute_image" "postgres_image" {
 resource "google_compute_instance" "postgres" {
   name         = "postgres"
   machine_type = "e2-medium"
-  zone         = "us-central1-a"
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
@@ -15,9 +15,8 @@ resource "google_compute_instance" "postgres" {
   }
 
   network_interface {
-    network = "default"
-    access_config {
-      nat_ip = google_compute_address.postgres_internal_address.address
-    }
+    network    = data.google_compute_network.default.id
+    subnetwork = data.google_compute_subnetwork.default.id
+    network_ip = google_compute_address.postgres_internal_address.address
   }
 }
