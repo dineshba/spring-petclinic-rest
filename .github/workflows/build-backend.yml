@@ -5,6 +5,8 @@ on:
     paths-ignore:
       - 'terraform/**'
       - 'readme.md'
+      - 'README-DEPLOYMENT.md'
+      - 'Makefile'
       - 'frontend.pkr.hcl'
       - 'postgres.pkr.hcl'
       - 'nginx.conf.tpl'
