@@ -74,3 +74,8 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64}}
       run: cd terraform && ./terraform.sh plan
+
+    - name: Apply
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64}}
+      run: cd terraform && ./terraform.sh apply -auto-approve
