@@ -16,5 +16,8 @@ resource "google_compute_instance" "postgres" {
 
   network_interface {
     network = "default"
+    access_config {
+      nat_ip = google_compute_address.postgres_internal_address.address
+    }
   }
 }

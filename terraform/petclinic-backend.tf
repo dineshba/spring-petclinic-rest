@@ -23,7 +23,7 @@ resource "google_compute_instance_template" "petclinic_application_instance_temp
   }
 
   metadata_startup_script = <<EOF
-export SPRING_DATASOURCE_URL=jdbc:postgresql://${google_compute_instance.postgres.network_interface.0.network_ip}:5432/petclinic
+export SPRING_DATASOURCE_URL=jdbc:postgresql://${google_compute_address.postgres_internal_address.address}:5432/petclinic
 export SPRING_PROFILES_ACTIVE=postgresql,spring-data-jpa
 export SPRING_JPA_HIBERNATE_DDLAUTO=update
 java -jar /app/spring-petclinic-rest-2.4.2.jar
@@ -80,26 +80,6 @@ resource "google_compute_firewall" "default" {
     "130.211.0.0/22",
     "35.191.0.0/16"
   ]
-}
-
-data "google_compute_network" "default" {
-  name = "default"
-}
-
-data "google_compute_subnetwork" "default" {
-  name   = "default"
-  region = var.region
-}
-
-resource "google_compute_address" "backend_internal_address" {
-  name         = "backend-internal-address"
-  subnetwork   = data.google_compute_subnetwork.default.id
-  address_type = "INTERNAL"
-  region       = var.region
-}
-
-output "load_balancer_ip_address" {
-  value = module.gce-ilb.ip_address
 }
 
 module "gce-ilb" {
