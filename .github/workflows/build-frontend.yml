@@ -2,6 +2,12 @@ name: "Build Frontend Image"
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'frontend.pkr.hcl'
+      - 'nginx.conf.tpl'
+    branches:
+      - main
 
 env:
   PKR_VAR_project_id: root-amulet-315711

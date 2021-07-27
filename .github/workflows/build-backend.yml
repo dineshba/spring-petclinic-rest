@@ -2,6 +2,16 @@ name: "Build Backend Image"
 
 on:
   push:
+    paths-ignore:
+      - 'terraform/**'
+      - 'readme.md'
+      - 'frontend.pkr.hcl'
+      - 'postgres.pkr.hcl'
+      - 'nginx.conf.tpl'
+      - 'LICENSE.txt'
+      - '.github/workflows/build-frontend.yml'
+      - '.github/workflows/build-postgres.yml'
+      - '.github/workflows/deployment.yml'
     branches:
       - main
 

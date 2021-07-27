@@ -19,10 +19,9 @@ defaults:
   run:
     shell: bash
 
-
 jobs:
-  plan:
-    name: Plan
+  plan_and_apply:
+    name: Plan and Apply
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
