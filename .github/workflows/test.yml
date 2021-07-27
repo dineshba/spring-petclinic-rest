@@ -1,0 +1,24 @@
+name: "Downloader"
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: deploy.yml
+        workflow_conclusion: success
+        branch: main
+        name: packer-manifest
+    - name: Print
+      run: cat packer-manifest
