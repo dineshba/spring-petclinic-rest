@@ -2,6 +2,14 @@ name: "Downloader"
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Build Backend Image"
+      - "Build Frontend Image"
+      - "Build Postgres Image"
+    branches: [main]
+    types:
+      - completed
 
 defaults:
   run:
