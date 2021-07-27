@@ -20,5 +20,10 @@ jobs:
         workflow_conclusion: success
         branch: main
         name: packer-manifest
+        path: backend
     - name: Print
-      run: cat packer-manifest.json
+      run: |
+        set +e
+        ls
+        cat packer-manifest.json
+        cat backend/packer-manifest.json
