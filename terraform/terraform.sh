@@ -11,4 +11,4 @@ if [ $# -eq 0 ]; then
     tf_action=plan
 fi
 
-terrafrom $tf_action
+terraform $tf_action
