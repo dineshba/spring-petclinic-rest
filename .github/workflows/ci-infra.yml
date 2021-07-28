@@ -3,7 +3,8 @@ name: 'Infra-CI-Pipeline'
 on: 
   push:
     paths:
-      - terraform/
+      - 'terraform/**'
+      - '.github/workflows/ci-infra.yml'
 
 defaults:
   run:
