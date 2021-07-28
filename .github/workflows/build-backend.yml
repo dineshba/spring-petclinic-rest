@@ -14,6 +14,7 @@ on:
       - '.github/workflows/build-frontend.yml'
       - '.github/workflows/build-postgres.yml'
       - '.github/workflows/deployment.yml'
+      - '.github/workflows/ci-infra.yml'
     branches:
       - main
 
