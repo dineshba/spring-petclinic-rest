@@ -7,6 +7,7 @@ on:
       - "Build Backend Image"
       - "Build Frontend Image"
       - "Build Postgres Image"
+      - 'Infra-CI-Pipeline'
     branches: [main]
     types:
       - completed
