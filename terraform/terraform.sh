@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 set -e
+set -o pipefail
+
 RED='\033[0;31m'
 NOCOLOR='\033[0m'
 
@@ -22,14 +24,22 @@ fi
 # We can write script to delete the unused instance templates
 # Refer existing issue: https://github.com/hashicorp/terraform/issues/6234
 if [[ $1 == apply ]]; then
-    terraform plan -out=tf-state
-    terraform show -json tf-state > tf-state.json
-    result=$(cat tf-state.json | jq '.resource_changes[] | select( .type | contains("google_compute_instance_template"))' | jq '. | select(.change.actions[] | contains("create")) | select(.change.actions[] | contains("delete")) | {address: .address, actions: .change.actions}' | jq -r .address)
-    if [[ $result ]]; then
-        while IFS=" " read -r line;
-            do printf "${RED}Deleting State for:${NOCOLOR} $line\n" && terraform state rm $line;
-        done <<< $result
-    fi
+    # terraform plan -out=tf-state
+    # terraform show -json tf-state > tf-state.json
+    # echo "after tf-state.json"
+    # ls -la
+    # type jq
+    # jq --version
+    # cat tf-state.json
+    # result=$(cat tf-state.json | jq '.resource_changes[] | select( .type | contains("google_compute_instance_template"))' | jq '. | select(.change.actions[] | contains("create")) | select(.change.actions[] | contains("delete")) | {address: .address, actions: .change.actions}' | jq -r .address)
+    # echo "result $result"
+    # exit 0
+    # if [[ $result ]]; then
+    #     IFS=" "
+    #     for line in $result; do
+    #         printf "${RED}Deleting State for:${NOCOLOR} $line\n" && terraform state rm $line || exit 1;
+    #     done
+    # fi
     terraform $tf_action
 else
     terraform $tf_action
