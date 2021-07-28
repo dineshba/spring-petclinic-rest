@@ -3,7 +3,7 @@ locals {
 }
 
 module "backend_instance_group" {
-  source     = "./modules/instance-group"
+  source      = "./modules/instance-group"
   image_name  = var.backend_image_id
   project     = var.project
   region      = var.region
