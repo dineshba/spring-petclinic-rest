@@ -1,6 +1,11 @@
 name: "Stack Deployment"
 
 on:
+  push:
+    paths:
+      - 'terraform/**'
+    branches:
+      - main
   workflow_dispatch:
   workflow_run:
     workflows:
