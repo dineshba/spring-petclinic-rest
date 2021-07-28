@@ -24,7 +24,7 @@ if [[ $1 == apply ]]; then
     terraform show -json tf-state > tf-state.json
     result=$(cat tf-state.json | jq '.resource_changes[] | select( .type | contains("google_compute_instance_template"))' | jq '. | select(.change.actions[] | contains("create")) | select(.change.actions[] | contains("delete")) | {address: .address, actions: .change.actions}' | jq -r .address)
     if [[ $result ]]; then
-        while IFS= read -r line;
+        while IFS=" " read -r line;
             do terraform state rm $line;
         done <<< $result
     fi
