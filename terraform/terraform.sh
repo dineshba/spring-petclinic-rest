@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 set -e
+RED='\033[0;31m'
+NOCOLOR='\033[0m'
 
 if [[ $GOOGLE_APPLICATION_CREDENTIALS_BASE64 ]]; then
     tmpDir=$(mktemp -d -t tmp.XXXXXXXXXX)
@@ -25,7 +27,7 @@ if [[ $1 == apply ]]; then
     result=$(cat tf-state.json | jq '.resource_changes[] | select( .type | contains("google_compute_instance_template"))' | jq '. | select(.change.actions[] | contains("create")) | select(.change.actions[] | contains("delete")) | {address: .address, actions: .change.actions}' | jq -r .address)
     if [[ $result ]]; then
         while IFS=" " read -r line;
-            do terraform state rm $line;
+            do printf "${RED}Deleting State for:${NOCOLOR} $line\n" && terraform state rm $line;
         done <<< $result
     fi
     terraform $tf_action
