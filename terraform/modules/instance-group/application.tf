@@ -24,7 +24,7 @@ resource "google_compute_instance_template" "instance_template" {
 }
 
 resource "google_compute_instance_group_manager" "igm" {
-  name = "${var.name}-${substr(google_compute_instance_template.instance_template.id, -26, -1)}"
+  name = "${var.name}-igm"
 
   base_instance_name = var.name
   zone               = var.zone

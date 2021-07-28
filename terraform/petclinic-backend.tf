@@ -32,7 +32,7 @@ module "gce-ilb" {
   source  = "GoogleCloudPlatform/lb-internal/google"
   version = "~> 2.0"
   region  = var.region
-  name    = "backend-ilb-${substr(module.backend_instance_group.id, -26, -1)}"
+  name    = "backend-ilb"
   ports   = ["9966"]
   health_check = {
     type                = "http"

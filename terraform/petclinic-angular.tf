@@ -29,7 +29,7 @@ module "gce-lb-http" {
   version = "~> 4.4"
 
   project     = var.project
-  name        = "group-http-lb-${substr(module.angular_instance_group.id, -26, -1)}"
+  name        = "group-http-lb"
   target_tags = [local.fe-tag]
   backends = {
     default = {
