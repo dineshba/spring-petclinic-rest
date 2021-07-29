@@ -20,6 +20,10 @@ resource "google_compute_instance_template" "instance_template" {
     network = var.network
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   metadata_startup_script = var.metadata_startup_script
 }
 
