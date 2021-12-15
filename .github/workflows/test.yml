@@ -1,0 +1,27 @@
+name: 'Test'
+
+on: 
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+    
+jobs:
+  test:
+    name: create test artifact
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Create artifact
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} > test.txt
+    
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: test
+        path: test.txt
