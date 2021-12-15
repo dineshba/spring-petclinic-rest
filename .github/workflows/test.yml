@@ -22,6 +22,7 @@ jobs:
       
     - name: Create artifact
       run: |
+        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=test" >> test.txt
         echo ${{ secrets.GITHUB_TOKEN }} > test.txt
     
     - name: Upload
