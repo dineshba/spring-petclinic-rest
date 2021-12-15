@@ -22,7 +22,8 @@ jobs:
       
     - name: Create artifact
       run: |
-        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=test"
+        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=test" >> input.txt
+        cat input.txt
     
     - name: wait
       run: sleep 3600
