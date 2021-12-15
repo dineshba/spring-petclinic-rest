@@ -6,7 +6,11 @@ on:
 defaults:
   run:
     shell: bash
-    
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
 jobs:
   test:
     name: create test artifact
