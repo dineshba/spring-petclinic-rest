@@ -1,0 +1,39 @@
+name: 'Test'
+
+on: 
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  test:
+    name: create test artifact
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        token_format: 'access_token'
+        workload_identity_provider: 'projects/sixth-pager-335217/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-pool-provider'
+        service_account: 'github-runner@sixth-pager-335217.iam.gserviceaccount.com'
+
+    - name: 'List Projects'
+      run: |-
+        curl https://cloudresourcemanager.googleapis.com/v1/projects \
+          --header "Authorization: Bearer ${{ steps.auth.outputs.access_token }}"
+          
+    - name: 'List Service Accounts'
+      run: |-
+        curl https://iam.googleapis.com/v1/projects/sixth-pager-335217/serviceAccounts \
+          --header "Authorization: Bearer ${{ steps.auth.outputs.access_token }}"
