@@ -1,4 +1,4 @@
-name: 'Test'
+name: 'Federation'
 
 on: 
   workflow_dispatch:
@@ -12,8 +12,8 @@ permissions:
   id-token: 'write'
 
 jobs:
-  test:
-    name: create test artifact
+  federation:
+    name: Federation
     runs-on: ubuntu-latest
     
     steps:

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   test:
-    name: create test artifact
+    name: Print ID Token
     runs-on: ubuntu-latest
     
     steps:
