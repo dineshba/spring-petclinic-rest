@@ -7,10 +7,6 @@ defaults:
   run:
     shell: bash
 
-permissions:
-  contents: 'read'
-  id-token: 'write'
-
 jobs:
   test:
     name: Print ID Token
@@ -19,18 +15,3 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
-    - name: Create artifact
-      run: |
-        curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=test" >> input.txt
-        IN=$(cat input.txt | jq .value)
-        echo $IN | base64
-        parts=$(echo $IN | tr "." "\n")
-
-        for part in $parts
-        do
-            echo "> [$part]"
-        done
-    
-    - name: wait
-      run: sleep 3600

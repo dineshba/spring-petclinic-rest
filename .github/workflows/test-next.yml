@@ -1,0 +1,27 @@
+name: 'Test'
+
+on: 
+  workflow_run:
+    workflows:
+      - "Test"
+  
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  only-on-tag:
+    if: startsWith(github.ref, 'refs/tags/v')
+    name: Print Tag
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Print TAG
+      run: |
+        echo "Tag: $TAG"
+      env:
+        TAG: ${{github.ref_name}}
